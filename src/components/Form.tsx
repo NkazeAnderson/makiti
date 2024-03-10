@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Training } from "../constants/mocks";
 type LecturerOBJ = {
   Name: string;

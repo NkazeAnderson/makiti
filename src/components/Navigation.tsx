@@ -1,5 +1,3 @@
-import React from "react";
-
 function Navigation({ action }: { action(): void }) {
   return (
     <div className="w-full h-[50px] bg-black text-white">
