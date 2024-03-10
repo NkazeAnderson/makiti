@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import CourseCard from "./components/CourseCard";
+import Navigation from "./components/Navigation";
+import { Training } from "./constants/mocks";
+import { get, post } from "./utilities/useFetch";
+import Form from "./components/Form";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [training, setTraining] = useState<Training | Training[]>();
 
-  return (
-    <>
+  useEffect(() => {
+    getTraining();
+  }, []);
+
+  const getTraining = (id?: string) => {
+    get(id ? "trainings/" + id : "trainings/").then((item) => {
+      setTraining(item);
+    });
+  };
+
+  if (!training) {
+    return (
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <p>Fethcing from backend...</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+    );
+  }
+
+  const addNewTraining = (fields: Training) => {
+    post(fields).then((res) => {
+      setTraining(res);
+      console.log("Response from Db");
+      console.log(res);
+    });
+  };
+  return (
+    <main className="bg-gray-900 w-screen h-screen ">
+      <Navigation action={() => getTraining()} />
+      <div className="w-full scrollView overflow-scroll">
+        {!Array.isArray(training) ? (
+          <CourseCard click={getTraining} training={training} />
+        ) : (
+          training.map((item) => (
+            <CourseCard key={item.name} click={getTraining} training={item} />
+          ))
+        )}
+        <section
+          id="formSection"
+          className="flex justify-center w-[50%] w-max-[600px] border mx-auto my-2 p-2 rounded-lg text-white"
+        >
+          <Form setTraining={(field) => addNewTraining(field)} />
+        </section>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </main>
+  );
 }
 
-export default App
+export default App;
